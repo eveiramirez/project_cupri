@@ -119,7 +119,8 @@ def assembly_stats_report(email: str, terms: list[str], download: bool):
     # lista
 
     if download:
-        print("YES")
+        for i, link in enumerate(stats_url_list):
+            urlretrieve(link, f"{ids_orgs[i]}.txt")
     else:
         # Guardar las lineas de cada archivo en un elemento de una lista
         stats_list = []
@@ -140,9 +141,3 @@ def assembly_stats_report(email: str, terms: list[str], download: bool):
 
         return stats_list
 
-
-speciess = ["Cupriavidus+agavae"]
-
-stats = assembly_stats_report("iramirez@lcg.unam.mx", speciess, False)
-
-print(stats)
