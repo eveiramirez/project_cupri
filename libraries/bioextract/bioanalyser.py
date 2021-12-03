@@ -35,8 +35,8 @@ class AmbiguousError(Exception):
     pass
 
 
-def get_taxid(email: str, species: list[str]):
-    """Obtener los TaxID"""
+def get_ids(email: str, species: list[str], db: str):
+    """Obtener los ids de una base de datos"""
 
     # Definir el correo necesario para la busqueda
     Entrez.email = email
@@ -45,7 +45,7 @@ def get_taxid(email: str, species: list[str]):
     ids = []
     for specie in species:
         # Guardar la busqueda
-        handle = Entrez.esearch(term=specie, db="taxonomy",
+        handle = Entrez.esearch(term=specie, db=db,
                                 retmode="xml")
         # Obtener la estructura del archivo XML de la busqueda
         record = Entrez.read(handle)
@@ -63,7 +63,8 @@ def get_taxid(email: str, species: list[str]):
 
 
 def get_tax_data(email: str, ids: list[str]):
-    """Obtener los linajes de los ids de la base de datos de Taxonomy"""
+    """Obtener los linajes de los ids de la base de datos de
+    Taxonomy. Requiere que la lista de ids sean TaxIDs"""
 
     # Definir el correo necesario para la busqueda
     Entrez.email = email
