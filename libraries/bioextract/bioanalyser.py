@@ -58,3 +58,25 @@ def get_taxid(email: str, species: list[str]):
 
     # Devolver los IDs
     return ids
+
+
+def get_tax_data(email: str, ids):
+    """Obtener los datos de Taxonomy"""
+
+    # Definir el correo necesario para la busqueda
+    Entrez.email = email
+
+    # Obtener los datos de Taxonomy
+    handle = Entrez.efetch(db="Taxonomy", id=ids, retmode="xml")
+
+    # Leer el archivo
+    species = Entrez.read(handle)
+
+    # Obtener los linajes
+    lineages = []
+    for specie in species:
+        specie = specie["Lineage"].split(";")
+        lineages.append(specie)
+
+    # Devolver los linajes
+    return species
