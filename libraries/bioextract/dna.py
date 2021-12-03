@@ -23,4 +23,4 @@ CATEGORY
         DNA
 """
 
-from .bioanalyser import (get_taxid)
+from bioanalyser import (get_taxid)

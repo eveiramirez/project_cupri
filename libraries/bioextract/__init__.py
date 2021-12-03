@@ -29,6 +29,6 @@ CATEGORY
 
 """
 
-from .bioanalyser import (get_taxid, get_tax_data)
+from bioanalyser import (get_taxid, get_tax_data)
 
 __all__ = ['get_taxid', 'get_tax_data', ]
