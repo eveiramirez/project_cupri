@@ -23,3 +23,9 @@ CATEGORY
         Sequence
 
 """
+
+
+# Crear la excepcion AmbiguousBaseError
+class AmbiguousError(Exception):
+    """Clase para el manejo de errores de distintos tipos."""
+    pass
