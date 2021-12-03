@@ -44,6 +44,7 @@ def get_ids(email: str, species: list[str], db: str):
 
     # Realizar la busquedas de ids
     ids = []
+    
     for specie in species:
         # Guardar la busqueda
         handle = Entrez.esearch(term=specie, db=db,
@@ -56,8 +57,9 @@ def get_ids(email: str, species: list[str], db: str):
             raise SystemExit(
                 f"Organismo '{specie}' no encontrado")
         else:
-            # Guardar el id
-            ids.append(record['IdList'][0])
+            for id in record['IdList']:
+                # Guardar el id
+                ids.append(id)
 
     # Devolver los IDs
     return ids
