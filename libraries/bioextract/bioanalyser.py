@@ -86,7 +86,8 @@ def get_tax_data(email: str, ids: list[str]):
     return lineages
 
 
-def assembly_stats_report(email: str, terms: list[str], download: bool):
+def assembly_stats_report(email: str, terms: list[str],
+                          download_dir=None):
     """Obtener los reportes de estadisticas de los organismos de la
     base de datos de Assembly"""
 
@@ -117,10 +118,9 @@ def assembly_stats_report(email: str, terms: list[str], download: bool):
 
     # Evaluar si se descargaran los archivos o se guardaran en una
     # lista
-
-    if download:
+    if type(download_dir) == str:
         for i, link in enumerate(stats_url_list):
-            urlretrieve(link, f"{ids_orgs[i]}.txt")
+            urlretrieve(link, f"{download_dir}/{ids_orgs[i]}.txt")
     else:
         # Guardar las lineas de cada archivo en un elemento de una lista
         stats_list = []
@@ -140,4 +140,3 @@ def assembly_stats_report(email: str, terms: list[str], download: bool):
         handle.close()
 
         return stats_list
-
