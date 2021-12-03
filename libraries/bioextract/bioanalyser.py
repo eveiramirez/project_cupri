@@ -89,7 +89,8 @@ def get_tax_data(email: str, ids: list[str]):
 def assembly_stats_report(email: str, terms: list[str],
                           download_dir=None):
     """Obtener los reportes de estadisticas de los organismos de la
-    base de datos de Assembly"""
+    base de datos de Assembly. En caso de crearse archivos, se les
+    asignara el nombre de acuerdo al ID obtenido de Assembly"""
 
     # Definir el correo necesario para la busqueda
     Entrez.email = email
@@ -99,6 +100,7 @@ def assembly_stats_report(email: str, terms: list[str],
 
     # Realizar la busqueda de ids
     ids_orgs = get_ids(Entrez.email, terms, db="Assembly")
+    print(ids_orgs)
 
     # Obtener los URLs de los reportes de estadisticas
     stats_url_list = []
