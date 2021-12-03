@@ -79,4 +79,4 @@ def get_tax_data(email: str, ids: list[str]):
         lineages.append(specie)
 
     # Devolver los linajes
-    return species
+    return lineages
