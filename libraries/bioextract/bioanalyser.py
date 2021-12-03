@@ -27,6 +27,7 @@ CATEGORY
 """
 
 from Bio import Entrez
+from urllib.request import (urlopen, urlretrieve)
 
 
 # Crear la excepcion AmbiguousBaseError
@@ -73,13 +74,75 @@ def get_tax_data(email: str, ids: list[str]):
     handle = Entrez.efetch(db="Taxonomy", id=ids, retmode="xml")
 
     # Leer el archivo
-    species = Entrez.read(handle)
+    organisms = Entrez.read(handle)
 
     # Obtener los linajes
     lineages = []
-    for specie in species:
-        specie = specie["Lineage"].split(";")
-        lineages.append(specie)
+    for organism in organisms:
+        organism = organism["Lineage"].split(";")
+        lineages.append(organism)
 
     # Devolver los linajes
     return lineages
+
+
+def assembly_stats_report(email: str, terms: list[str], download: bool):
+    """Obtener los reportes de estadisticas de los organismos de la
+    base de datos de Assembly"""
+
+    # Definir el correo necesario para la busqueda
+    Entrez.email = email
+
+    # Inicializar handle
+    handle = None
+
+    # Realizar la busqueda de ids
+    ids_orgs = get_ids(Entrez.email, terms, db="Assembly")
+
+    # Obtener los URLs de los reportes de estadisticas
+    stats_url_list = []
+
+    for id in ids_orgs:
+        handle = Entrez.efetch(db="Assembly", id=id,
+                               rettype="docsum")
+
+        organism = Entrez.read(handle)
+
+        # Obtener el url de las estadisticas
+        assembly_stats_url = organism['DocumentSummarySet'][
+            "DocumentSummary"][0]["FtpPath_Stats_rpt"]
+        assembly_stats_url = assembly_stats_url.replace("ftp:",
+                                                        "https:")
+        stats_url_list.append(assembly_stats_url)
+
+    # Evaluar si se descargaran los archivos o se guardaran en una
+    # lista
+
+    if download:
+        print("YES")
+    else:
+        # Guardar las lineas de cada archivo en un elemento de una lista
+        stats_list = []
+        for link in stats_url_list:
+            # Abrir el archivo y leerlo
+            file = urlopen(link)
+            file = file.readlines()
+
+            # Cambiar la codificación de las lineas por utf-8,
+            # y eliminar los caracteres \r y \n
+            for i, line in enumerate(file):
+                file[i] = line.decode(encoding='utf-8').replace("\r\n",
+                                                                "")
+            # Guardar las lineas del archivo en la lista
+            stats_list.append(file)
+
+        handle.close()
+
+        return stats_list
+
+
+speciess = ["Cupriavidus+agavae"]
+
+stats = assembly_stats_report("iramirez@lcg.unam.mx", speciess, False)
+
+print(stats)
