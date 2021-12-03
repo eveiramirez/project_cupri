@@ -1,6 +1,6 @@
 """
 PACKAGE NAME
-        bioextract
+        bioanalyser
 
 VERSION
         [0.0.1]
