@@ -60,7 +60,7 @@ def get_taxid(email: str, species: list[str]):
     return ids
 
 
-def get_tax_data(email: str, ids):
+def get_tax_data(email: str, ids: list[str]):
     """Obtener los datos de Taxonomy"""
 
     # Definir el correo necesario para la busqueda
