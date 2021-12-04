@@ -17,7 +17,7 @@ CONTACT
         iramirez@lcg.unam.mx
 
 DESCRIPTION
-        Modulo principal para análisis de archivos
+        Modulo principal para analisis de archivos
 
 CATEGORY
         Extractor
