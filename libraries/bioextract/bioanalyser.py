@@ -41,23 +41,24 @@ def get_ids(email: str, organisms: list[str], db: str):
     # Definir el correo necesario para la busqueda
     Entrez.email = email
 
-    # Realizar la busquedas de ids
+    # Crear la lista para los IDs
     ids = []
-    
+
+    # Realizar la busquedas de ids
     for organism in organisms:
-        # Guardar la busqueda
+        # Hacer la busqueda y guardarla en el handle
         handle = Entrez.esearch(term=organism, db=db,
                                 retmode="xml")
         # Obtener la estructura del archivo XML de la busqueda
         record = Entrez.read(handle)
 
-        # Evaluar si la lista esta vacia
+        # Evaluar si la lista de IDs esta vacia
         if len(record['IdList']) == 0:
             raise SystemExit(
                 f"Organismo '{organism}' no encontrado")
         else:
+            # Guardar los IDs
             for id_org in record['IdList']:
-                # Guardar el id
                 ids.append(id_org)
 
     # Devolver los IDs
@@ -96,7 +97,7 @@ def assembly_stats_report(email: str, terms: list[str],
     # Definir el correo necesario para la busqueda
     Entrez.email = email
 
-    # Inicializar handle
+    # Inicializar el handle
     handle = None
 
     # Realizar la busqueda de ids
@@ -106,22 +107,31 @@ def assembly_stats_report(email: str, terms: list[str],
     stats_url_list = []
 
     for id_org in ids_orgs:
+        # Obtener el resumen del record
         handle = Entrez.efetch(db="Assembly", id=id_org,
                                rettype="docsum")
 
+        # Obtener su estructura
         organism = Entrez.read(handle)
 
-        # Obtener el url de las estadisticas
+        # Obtener el URL de las estadisticas
         assembly_stats_url = organism['DocumentSummarySet'][
             "DocumentSummary"][0]["FtpPath_Stats_rpt"]
         assembly_stats_url = assembly_stats_url.replace("ftp:",
                                                         "https:")
+        # Guardar el URL en una lista
         stats_url_list.append(assembly_stats_url)
+
+    handle.close()
 
     # Evaluar si se descargaran los archivos o se guardaran en una
     # lista
     if type(download_dir) == str:
+        # Crear los archivos de los reportes de cada organismo en el
+        # directorio indicado
         for i, link in enumerate(stats_url_list):
+
+            # Guardar el archivo con su UID de Assembly como nombre
             urlretrieve(link, f"{download_dir}/{ids_orgs[i]}.txt")
     else:
         # Guardar las lineas de cada archivo en un elemento de una lista
@@ -138,8 +148,6 @@ def assembly_stats_report(email: str, terms: list[str],
                                                                 "")
             # Guardar las lineas del archivo en la lista
             stats_list.append(file)
-
-        handle.close()
 
         return stats_list
 
