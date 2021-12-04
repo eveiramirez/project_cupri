@@ -44,13 +44,13 @@ def find_info(key):
     lin = information.find("dd").find_all("a")
     lineage = []
     for taxa in lin:
-       lineage.append(taxa.text)
+        lineage.append(taxa.text)
 
     rank = information.find("h2").find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().text
 
     main[key]["lineage"] = lineage
     main[key]["rank"] = rank
-    
+
     bacdive = main_page.find(href="http://bacdive.dsmz.de/")
     gold = main_page.find(href="http://genomesonline.org")
     oma = main_page.find(href="http://omabrowser.org")
@@ -60,11 +60,12 @@ def find_info(key):
         bd = requests.get(bacdive_link)
         bacdive_page = BeautifulSoup(bd.content, 'html5lib')
         sections = bacdive_page.find(id="content")
-        #section 1 (no subtables needed)
+        # section 1 (no subtables needed)
         oxygen_tolerance = sections.find(attrs={"data-src-tbl": "oxygen_tolerance"})
         if oxygen_tolerance != None:
             oxygen_tolerance = oxygen_tolerance.find_next_sibling().find_next_sibling().text
-        #section 2
+
+        # section 2
         table = sections.find(id="temp_table") #subtable1
         culture_temperature = table.find(attrs={"data-src-tbl": "culture_temp"})
         if culture_temperature != None:
@@ -73,7 +74,8 @@ def find_info(key):
         temperature_range = table.find(attrs={"data-src-tbl": "culture_temp"})
         if temperature_range != None:
             temperature_range = temperature_range.find_next_sibling().find_next_sibling().text
-        #section 3
+
+        # section 3
         table = sections.find(attrs={"class": "id_4 section expandsection"}).find_all("tr")
         location = table[1].find(attrs={"data-src-tbl": "origin"})
         if location != None:
@@ -84,7 +86,8 @@ def find_info(key):
         continent = table[3].find(attrs={"data-src-tbl": "origin"})
         if continent != None:
             continent = continent.find_next_sibling().find_next_sibling().text
-        #section 4
+
+        # section 4
         biosafety_level_A = sections.find(attrs={"data-src-tbl": "risk_assessment"}).find_next_sibling().find_next_sibling().text
         """
         print(oxygen_tolerance)
@@ -113,7 +116,7 @@ def find_info(key):
         gd = requests.get(gold_link)
         gold_page = BeautifulSoup(gd.content, 'html5lib')
         table = gold_page.find(id="OrganismInformation").find("tbody").find_all("tr")
-    
+
         organism_type = table[18].find("td").find_next_sibling().text.strip()
         is_cultured = table[19].find("td").find_next_sibling().text.strip()
         culture_type = table[20].find("td").find_next_sibling().text.strip()
@@ -142,7 +145,7 @@ def find_info(key):
         oa = requests.get(oma_link)
         oma_page = BeautifulSoup(oa.content, 'html5lib')
         body = oma_page.find_all("dd")
-    
+
         sequence_number = body[-4].string
         matrix_protein = body[-3].string
         amino = body[-2].string

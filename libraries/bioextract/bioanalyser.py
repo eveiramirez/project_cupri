@@ -56,9 +56,9 @@ def get_ids(email: str, organisms: list[str], db: str):
             raise SystemExit(
                 f"Organismo '{organism}' no encontrado")
         else:
-            for id in record['IdList']:
+            for id_org in record['IdList']:
                 # Guardar el id
-                ids.append(id)
+                ids.append(id_org)
 
     # Devolver los IDs
     return ids
@@ -105,8 +105,8 @@ def assembly_stats_report(email: str, terms: list[str],
     # Obtener los URLs de los reportes de estadisticas
     stats_url_list = []
 
-    for id in ids_orgs:
-        handle = Entrez.efetch(db="Assembly", id=id,
+    for id_org in ids_orgs:
+        handle = Entrez.efetch(db="Assembly", id=id_org,
                                rettype="docsum")
 
         organism = Entrez.read(handle)
