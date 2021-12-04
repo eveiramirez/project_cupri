@@ -44,6 +44,7 @@ def get_ids(email: str, species: list[str], db: str):
 
     # Realizar la busquedas de ids
     ids = []
+    
     for specie in species:
         # Guardar la busqueda
         handle = Entrez.esearch(term=specie, db=db,
@@ -56,8 +57,9 @@ def get_ids(email: str, species: list[str], db: str):
             raise SystemExit(
                 f"Organismo '{specie}' no encontrado")
         else:
-            # Guardar el id
-            ids.append(record['IdList'][0])
+            for id in record['IdList']:
+                # Guardar el id
+                ids.append(id)
 
     # Devolver los IDs
     return ids
@@ -100,7 +102,6 @@ def assembly_stats_report(email: str, terms: list[str],
 
     # Realizar la busqueda de ids
     ids_orgs = get_ids(Entrez.email, terms, db="Assembly")
-    print(ids_orgs)
 
     # Obtener los URLs de los reportes de estadisticas
     stats_url_list = []
@@ -142,3 +143,6 @@ def assembly_stats_report(email: str, terms: list[str],
         handle.close()
 
         return stats_list
+
+
+assembly_stats_report("iramirez@lcg.unam.mx", ["Cupriavidus"], "..")
