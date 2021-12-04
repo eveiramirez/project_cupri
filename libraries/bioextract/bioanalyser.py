@@ -157,7 +157,7 @@ parser = argparse.ArgumentParser(description="Programa que cuenta con "
 parser.add_argument("-f", "--function",
                     type=str,
                     help="Funcion a realizar. Requiere que se indique "
-                         "el numero de la funcion. "
+                         "el numero de la funcion."
                          "0: get_ids"
                          "1: get_tax_data"
                          "2: assembly_stats_report")
@@ -232,17 +232,23 @@ arg_str = args.function
 if arg_str.isdigit():
     function = int(arg_str)
 else:
-    raise SystemExit("El valor dado de la funcion no es valido")
+    raise SystemExit(f"El numero de funcion '{arg_str}' no pertenece a "
+                     f"ninguna funcion")
 
 
 # Evaluar cual funcion ejecutar
 if function == 0:
-    get_ids(args.email, args.organisms.split(","), args.data_base)
+    print(get_ids(args.email, args.organisms.split(","), 
+                  args.data_base))
 elif function == 1:
-    get_tax_data(args.email, args.ids.split(","))
+    print(get_tax_data(args.email, args.ids.split(",")))
 elif function == 2:
-    assembly_stats_report(args.email, args.organisms.split(","),
-                          args.output)
+    if args.output is None:
+        print(assembly_stats_report(args.email, args.organisms.split(
+            ","), args.output))
+    else:
+        assembly_stats_report(args.email, args.organisms.split(
+            ","), args.output)
 else:
-    raise SystemExit(f"El numero de funcion {function} no pertenece a "
-                     f"ninguna funcion")
+    raise SystemExit(f"El numero de funcion '{function}' no pertenece a"
+                     f" ninguna funcion")
