@@ -17,7 +17,7 @@ CONTACT
         iramirez@lcg.unam.mx
 
 DESCRIPTION
-        Modulo principal para análisis de archivos
+        Modulo principal para analisis de archivos
 
 CATEGORY
         Extractor
@@ -28,6 +28,7 @@ CATEGORY
 
 from Bio import Entrez
 from urllib.request import (urlopen, urlretrieve)
+import argparse
 
 
 # Crear la excepcion AmbiguousBaseError
@@ -36,7 +37,7 @@ class AmbiguousError(Exception):
     pass
 
 
-def get_ids(email: str, species: list[str], db: str):
+def get_ids(email: str, organisms: list[str], db: str):
     """Obtener los ids de una base de datos"""
 
     # Definir el correo necesario para la busqueda
@@ -45,9 +46,9 @@ def get_ids(email: str, species: list[str], db: str):
     # Realizar la busquedas de ids
     ids = []
     
-    for specie in species:
+    for organism in organisms:
         # Guardar la busqueda
-        handle = Entrez.esearch(term=specie, db=db,
+        handle = Entrez.esearch(term=organism, db=db,
                                 retmode="xml")
         # Obtener la estructura del archivo XML de la busqueda
         record = Entrez.read(handle)
@@ -55,7 +56,7 @@ def get_ids(email: str, species: list[str], db: str):
         # Evaluar si la lista esta vacia
         if len(record['IdList']) == 0:
             raise SystemExit(
-                f"Organismo '{specie}' no encontrado")
+                f"Organismo '{organism}' no encontrado")
         else:
             for id in record['IdList']:
                 # Guardar el id
@@ -89,7 +90,7 @@ def get_tax_data(email: str, ids: list[str]):
 
 
 def assembly_stats_report(email: str, terms: list[str],
-                          download_dir=None):
+                          download_dir):
     """Obtener los reportes de estadisticas de los organismos de la
     base de datos de Assembly. En caso de crearse archivos, se les
     asignara el nombre de acuerdo al ID obtenido de Assembly"""
@@ -145,4 +146,109 @@ def assembly_stats_report(email: str, terms: list[str],
         return stats_list
 
 
-assembly_stats_report("iramirez@lcg.unam.mx", ["Cupriavidus"], "..")
+# Crear la descripcion del programa
+parser = argparse.ArgumentParser(description="Programa que cuenta con "
+                                             "diferentes funciones "
+                                             "para el analisis y "
+                                             "extraccion de datos de "
+                                             "NCBI")
+
+# Anadir los argumentos
+parser.add_argument("-f", "--function",
+                    type=str,
+                    help="Funcion a realizar. Requiere que se indique "
+                         "el numero de la funcion."
+                         "0: get_ids"
+                         "1: get_tax_data"
+                         "2: assembly_stats_report")
+
+parser.add_argument("-e", "--email",
+                    type=str,
+                    help="email requerido para el uso de los servers "
+                         "de E-utility")
+
+parser.add_argument("-g", "--organisms",
+                    type=str,
+                    help="Lista de organismos con los cuales se "
+                         "realizara la "
+                         "busqueda separados por comas. Solo se "
+                         "requiere para las "
+                         "funciones 0,2")
+
+parser.add_argument("-i", "--ids",
+                    type=str,
+                    help="Lista de Taxonomy IDs separados por comas de "
+                         "los organismos a buscar. Este parametro solo "
+                         "es necesario para la funcion 1")
+
+parser.add_argument("-d", "--data_base",
+                    type=str,
+                    help="Base de datos a realizar la busqueda. Solo "
+                         "es necesario para la funcion 0")
+
+parser.add_argument("-o", "--output",
+                    type=str,
+                    help="Directorio para guardar los archivos "
+                         "generados por la funcion 2. En caso de no "
+                         "proporcionarse la funcion devolvera los "
+                         "resultados en forma de lista")
+
+# Ejecutar el metodo parse_args()
+args = parser.parse_args()
+
+# Comprobar si se tienen todos los argumentos necesarios
+val_errs = []
+try:
+    argument = [args.function, args.email, args.organisms, args.ids,
+                args.data_base, args.output]
+    invalid = 0
+    if argument[0] is None:
+        val_errs.append("No se obtuvo la funcion que se desea ejecutar")
+        invalid = 1
+    if argument[0] == "0":
+        if argument[4] is None:
+            val_errs.append("No se obtuvo la base de datos")
+            invalid = 1
+    if argument[0] == "1":
+        if argument[3] is None:
+            val_errs.append("No se obtuvo la lista de TaxIDs")
+            invalid = 1
+    if argument[0] == "0" or argument[0] == "2":
+        if argument[2] is None:
+            val_errs.append("No se obtuvo la lista de organismos")
+            invalid = 1
+    if argument[1] is None:
+        val_errs.append("No se obtuvo el email")
+        invalid = 1
+    if invalid:
+        raise ValueError
+except ValueError:
+    for val_err in val_errs:
+        print(f"{val_err}: El valor es None")
+    raise SystemExit(1)
+
+# Evaluar si para el parametro de funcion se dio un numero valido
+arg_str = args.function
+if arg_str.isdigit():
+    function = int(arg_str)
+else:
+    raise SystemExit(f"El numero de funcion '{arg_str}' no pertenece a "
+                     f"ninguna funcion")
+
+
+# Evaluar cual funcion ejecutar
+if function == 0:
+    print(get_ids(args.email, args.organisms.split(","), 
+                  args.data_base))
+elif function == 1:
+    print(get_tax_data(args.email, args.ids.split(",")))
+elif function == 2:
+    if args.output is None:
+        print(assembly_stats_report(args.email, args.organisms.split(
+            ","), args.output))
+    else:
+        assembly_stats_report(args.email, args.organisms.split(
+            ","), args.output)
+else:
+    raise SystemExit(f"El numero de funcion '{function}' no pertenece a"
+                     f" ninguna funcion")
