@@ -10,8 +10,6 @@ PYTHON VERSION
 
 AUTHORS
         Ignacio Emmanuel Ramirez Bernabe
-        Diego
-        Melissa
 
 CONTACT
         iramirez@lcg.unam.mx

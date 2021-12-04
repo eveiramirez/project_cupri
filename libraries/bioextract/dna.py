@@ -9,9 +9,7 @@ PYTHON VERSION
         3.9
 
 AUTHORS
-        Ignacio Emmanuel Ramirez Bernabe
         Diego
-        Melissa
 
 CONTACT
         iramirez@lcg.unam.mx
@@ -23,7 +21,6 @@ CATEGORY
         DNA
 """
 
-from bioanalyser import (get_taxid)
 from bs4 import BeautifulSoup
 import requests
 import json
@@ -33,9 +30,11 @@ main = {}
 with open('archaea.txt') as m:
     main = json.load(m)
 
+
 def find_info(key):
     if main[key]['link'][0:4] != "http":
-        main[key]['link'] = "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/" + main[key]['link']
+        main[key]['link'] = "https://www.ncbi.nlm.nih.gov/Taxonomy" \
+                            "/Browser/" + main[key]['link']
     r = requests.get(main[key]['link'])
 
     main_page = BeautifulSoup(r.content, 'html5lib')
@@ -105,8 +104,10 @@ def find_info(key):
         main[key]["biosafety_A"] = biosafety_level_A
         print("b success!")
     except:
-        print("failed to retrieve bacdive data for: " + k + ":" + main[k]["name"])
-        failed.append("failed to retrieve bacdive data for: " + k + ":" + main[k]["name"])
+        print("failed to retrieve bacdive data for: " + k + ":" +
+              main[k]["name"])
+        failed.append("failed to retrieve bacdive data for: " + k + ":"
+                      + main[k]["name"])
     try:
         gold_link = gold.parent.parent.find("a")["href"]
         gd = requests.get(gold_link)
@@ -116,24 +117,26 @@ def find_info(key):
         organism_type = table[18].find("td").find_next_sibling().text.strip()
         is_cultured = table[19].find("td").find_next_sibling().text.strip()
         culture_type = table[20].find("td").find_next_sibling().text.strip()
-        biosafety_level_B = table[22].find("td").find_next_sibling().text.strip()
+        biosafety_level_b = table[22].find("td").find_next_sibling().text.strip()
         is_public = table[27].find("td").find_next_sibling().text.strip()
         """
         print(organism_type)
         print(is_cultured)
         print(culture_type)
-        print(biosafety_level_B)
+        print(biosafety_level_b)
         print(is_public)
         """
         main[key]["organism_type"] = organism_type
         main[key]["is_cultured"] = is_cultured
         main[key]["culture_type"] = culture_type
-        main[key]["biosafety_B"] = biosafety_level_B
+        main[key]["biosafety_B"] = biosafety_level_b
         main[key]["is_public"] = is_public
         print("g success!")
     except:
-        print("failed to retrieve gold data for: " + k + ":" + main[k]["name"])
-        failed.append("failed to retrieve gold data for: " + k + ":" + main[k]["name"])
+        print("failed to retrieve gold data for: " + k + ":" +
+              main[k]["name"])
+        failed.append("failed to retrieve gold data for: " + k + ":" +
+                      main[k]["name"])
     try:
         oma_link = oma.parent.parent.find("a")["href"]
         oa = requests.get(oma_link)
@@ -156,8 +159,11 @@ def find_info(key):
         main[key]["protein_length"] = protein_length
         print("o success!")
     except:
-        print("failed to retrieve oma data for: " + k + ":" + main[k]["name"])
-        failed.append("failed to retrieve oma data for: " + k + ":" + main[k]["name"])
+        print("failed to retrieve oma data for: " + k + ":" +
+              main[k]["name"])
+        failed.append("failed to retrieve oma data for: " + k + ":" +
+                      main[k]["name"])
+
 
 count = 1
 for k in main:
