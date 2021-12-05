@@ -27,7 +27,7 @@ CATEGORY
 from Bio import Entrez
 from urllib.request import (urlopen, urlretrieve)
 import argparse
-from re import match
+from re import match, search
 import pandas as pd
 
 
@@ -222,7 +222,7 @@ def last_match(pattern, list_strings: list[str]):
             return list_strings.index(stat)
 
 
-def stats_dataframe(email: str, terms: list[str]):
+def stats_dataframe(email: str, terms: list[str], output=None):
     """Crea un dataframe de las estadisticas de ensambles de
     organismos a partir de una lista con diccionarios"""
 
@@ -251,7 +251,18 @@ def stats_dataframe(email: str, terms: list[str]):
             # Unir
             stats_df[stats_series.name] = stats_series
 
-    return stats_df
+    # Evaluar si se se guardara el dataframe en un archivo csv
+
+    if type(output) == str:
+        try:
+            # Crear el archivo del dataframe en formato csv
+            stats_df.to_csv(output)
+        # Imprimir un error si la ruta del output es invalida
+        except IOError as ex:
+            print('El archivo no pudo ser creado: ' + ex.strerror)
+
+    else:
+        return stats_df
 
 
 class AssemblyStatisticsReport(object):
@@ -296,7 +307,8 @@ parser.add_argument("-f", "--function",
                          "el numero de la funcion."
                          "0: get_ids"
                          "1: get_tax_data"
-                         "2: assembly_stats_report")
+                         "2: assembly_stats_report"
+                         "3: stats_dataframe")
 
 parser.add_argument("-e", "--email",
                     type=str,
@@ -309,7 +321,7 @@ parser.add_argument("-g", "--organisms",
                          "realizara la "
                          "busqueda separados por comas. Solo se "
                          "requiere para las "
-                         "funciones 0,2")
+                         "funciones 0,2,3")
 
 parser.add_argument("-i", "--ids",
                     type=str,
@@ -325,9 +337,10 @@ parser.add_argument("-d", "--data_base",
 parser.add_argument("-o", "--output",
                     type=str,
                     help="Directorio para guardar los archivos "
-                         "generados por la funcion 2. En caso de no "
-                         "proporcionarse la funcion devolvera los "
-                         "resultados en forma de lista.")
+                         "generados por las funciones 2,3. En caso de "
+                         "no proporcionarse la funcion 2 devolvera los "
+                         "resultados en forma de lista y la funcion 3 "
+                         "en un dataframe")
 
 # Ejecutar el metodo parse_args()
 args = parser.parse_args()
@@ -349,7 +362,7 @@ try:
         if argument[3] is None:
             val_errs.append("No se obtuvo la lista de TaxIDs")
             invalid = 1
-    if argument[0] == "0" or argument[0] == "2":
+    if argument[0] == "0" or argument[0] == "2" or argument[0] == "3":
         if argument[2] is None:
             val_errs.append("No se obtuvo la lista de organismos")
             invalid = 1
@@ -380,10 +393,21 @@ elif function == 1:
 elif function == 2:
     if args.output is None:
         print(assembly_stats_report(args.email, args.organisms.split(
-            ","), args.output))
+            ",")))
     else:
         assembly_stats_report(args.email, args.organisms.split(
             ","), args.output)
+elif function == 3:
+    if args.output is None:
+        print(stats_dataframe(args.email, args.organisms.split(
+            ",")))
+    else:
+        if search(r".csv$", args.output):
+            stats_dataframe(args.email, args.organisms.split(
+                ","), args.output)
+        else:
+            raise AmbiguousError("La extension del archivo no es "
+                                 "csv")
 else:
     raise SystemExit(f"El numero de funcion '{function}' no pertenece a"
                      f" ninguna funcion")
