@@ -497,7 +497,7 @@ elif function == 3:
         else:
             raise AmbiguousError("La extension del archivo no es "
                                  "csv")
-elif function == 3:
+elif function == 4:
     stats_graph(args.email, args.organisms.split(
                 ","), args.stat, args.output)
 else:
