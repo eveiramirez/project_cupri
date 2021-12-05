@@ -28,9 +28,7 @@ from Bio import Entrez
 from urllib.request import (urlopen, urlretrieve)
 import argparse
 from re import match
-
-
-# import pandas as pd
+import pandas as pd
 
 
 # Crear la excepcion AmbiguousBaseError
@@ -200,7 +198,7 @@ def get_stats_dictionary(reports: list):
         last_index = last_match(r'^(all\t){4}', organism)
 
         # Guardar las estadisticas de todas las secuencias
-        for stat in organism[first_index + 1:last_index+1]:
+        for stat in organism[first_index + 1:last_index + 1]:
             stat = stat.replace('all\tall\tall\tall\t', "")
 
             # Separar el nombre del estadistico y su valor
@@ -222,6 +220,66 @@ def last_match(pattern, list_strings: list[str]):
     for stat in list_strings[::-1]:
         if match(pattern, stat):
             return list_strings.index(stat)
+
+
+def stats_dataframe(email: str, terms: list[str]):
+    """Crea un dataframe de las estadisticas de ensambles de
+    organismos a partir de una lista con diccionarios"""
+
+    # Obtener las estadisticas
+    stats_reports = assembly_stats_report(email, terms)
+
+    # Obtener los diccionarios de las estadisticas
+    dictionaries = get_stats_dictionary(stats_reports)
+
+    # Obtener la serie de los primeros estadisticos del primer
+    # organismo para crear el dataframe
+    stats_series = pd.Series(dictionaries[0].values(),
+                             index=dictionaries[0].keys(),
+                             name=dictionaries[0]["Assembly name"])
+
+    # Crear dataframe
+    stats_df = pd.DataFrame({stats_series.name: stats_series})
+
+    # Verificar que existan mas diccionarios
+    if len(dictionaries) > 1:
+        # Guardar las estadisticas de los otros ensambles
+        for stats in dictionaries[1:]:
+            stats_series = pd.Series(stats.values(),
+                                     index=stats.keys(),
+                                     name=stats["Assembly name"])
+            # Unir
+            stats_df[stats_series.name] = stats_series
+
+    return stats_df
+
+
+class AssemblyStatisticsReport(object):
+    """
+    Clase para almacenar el reporte de las estadisticas de un ensamble.
+
+    Atributos
+    ---------
+    stats: Diccionario de estadisticas del ensamble
+
+    Metodos
+    -------
+    table(self)
+        Genera una tabla con las estadisticas
+
+    """
+
+    def __init__(self, stats: dict):
+        self.stats = stats
+        self.assembly_name = stats["Assembly name"]
+        self.organism_name = stats["Organism name"]
+
+    def table(self):
+        """Genera una tabla con las estadisticas"""
+        stats_series = pd.Series(self.stats.values(),
+                                 index=self.stats.keys(),
+                                 name=self.assembly_name)
+        return stats_series
 
 
 # Crear la descripcion del programa
