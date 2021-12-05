@@ -135,7 +135,7 @@ def assembly_stats_report(email: str, terms: list[str],
                 # Guardar el archivo con su UID de Assembly como nombre
                 urlretrieve(link, f"{download_dir}/{ids_orgs[i]}.txt")
 
-        # Imprimir un error si la ruta del input es invalida
+        # Imprimir un error si la ruta del output es invalida
         except IOError as ex:
             print('Los archivos no pudieron ser creados: ' +
                   ex.strerror)
