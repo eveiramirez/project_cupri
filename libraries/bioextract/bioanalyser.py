@@ -27,6 +27,10 @@ CATEGORY
 from Bio import Entrez
 from urllib.request import (urlopen, urlretrieve)
 import argparse
+from re import match
+
+
+# import pandas as pd
 
 
 # Crear la excepcion AmbiguousBaseError
@@ -89,7 +93,7 @@ def get_tax_data(email: str, ids: list[str]):
 
 
 def assembly_stats_report(email: str, terms: list[str],
-                          download_dir):
+                          download_dir=None):
     """Obtener los reportes de estadisticas de los organismos de la
     base de datos de Assembly. En caso de crearse archivos, se les
     asignara el nombre de acuerdo al ID obtenido de Assembly"""
@@ -131,7 +135,6 @@ def assembly_stats_report(email: str, terms: list[str],
         # directorio indicado
         try:
             for i, link in enumerate(stats_url_list):
-
                 # Guardar el archivo con su UID de Assembly como nombre
                 urlretrieve(link, f"{download_dir}/{ids_orgs[i]}.txt")
 
@@ -156,6 +159,69 @@ def assembly_stats_report(email: str, terms: list[str],
             stats_list.append(file)
 
         return stats_list
+
+
+def get_stats_dictionary(reports: list):
+    """Obtener a partir de una lista de reportes de estadisticas de
+    ensambles obtenidos por assembly_stats_report una lista de
+    diccionarios que almacenen las estadisticas correspondientes a
+    todas las secuencias y del reporte"""
+
+    # Creas lista de diccionarios
+    stats_list = []
+
+    # Obtener elementos de Assembly Statistics Report
+    for organism in reports:
+        # Crear diccionario
+        stats_dict = {}
+
+        # Obtener los estadisticos antes de Assembly-Units
+        last_index = organism.index("## Assembly-Units:")
+
+        for stat in organism[1:last_index - 1]:
+            # Separar el nombre del estadistico y su valor
+            elements = stat.split(":")
+
+            # Obtener el nombre del estadistico
+            elements[0] = elements[0].replace("# ", "")
+
+            # Eliminar espacios que esten en extremos del valor
+            elements[1] = elements[1].lstrip()
+
+            # Guardar en el diccionario
+            stats_dict[f"{elements[0]}"] = elements[1]
+
+        # Obtener el inicio de las estadisticas de todas las secuencias
+        first_index = organism.index("# unit-name\tmolecule-name\t"
+                                     "molecule-type/loc\tsequence-type"
+                                     "\tstatistic\tvalue")
+
+        # Obtener la posicion de la estadistica final
+        last_index = last_match(r'^(all\t){4}', organism)
+
+        # Guardar las estadisticas de todas las secuencias
+        for stat in organism[first_index + 1:last_index+1]:
+            stat = stat.replace('all\tall\tall\tall\t', "")
+
+            # Separar el nombre del estadistico y su valor
+            elements = stat.split("\t")
+
+            # Guardar en el diccionario el estadistico
+            stats_dict[f"{elements[0]}"] = elements[1]
+
+        # Guardar el diccionario en la lista
+        stats_list.append(stats_dict)
+
+    return stats_list
+
+
+def last_match(pattern, list_strings: list[str]):
+    """Obtener de una lista la posicion del ultimo elemento que
+    coincida con un patron"""
+
+    for stat in list_strings[::-1]:
+        if match(pattern, stat):
+            return list_strings.index(stat)
 
 
 # Crear la descripcion del programa
@@ -203,7 +269,7 @@ parser.add_argument("-o", "--output",
                     help="Directorio para guardar los archivos "
                          "generados por la funcion 2. En caso de no "
                          "proporcionarse la funcion devolvera los "
-                         "resultados en forma de lista")
+                         "resultados en forma de lista.")
 
 # Ejecutar el metodo parse_args()
 args = parser.parse_args()
@@ -247,10 +313,9 @@ else:
     raise SystemExit(f"El numero de funcion '{arg_str}' no pertenece a "
                      f"ninguna funcion")
 
-
 # Evaluar cual funcion ejecutar
 if function == 0:
-    print(get_ids(args.email, args.organisms.split(","), 
+    print(get_ids(args.email, args.organisms.split(","),
                   args.data_base))
 elif function == 1:
     print(get_tax_data(args.email, args.ids.split(",")))
