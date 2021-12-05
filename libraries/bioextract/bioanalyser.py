@@ -29,12 +29,9 @@ from urllib.request import (urlopen, urlretrieve)
 from argparse import ArgumentParser, RawTextHelpFormatter
 from re import match, search
 import pandas as pd
-
-
-# Crear la excepcion AmbiguousBaseError
-class AmbiguousError(Exception):
-    """Clase para el manejo de errores de distintos tipos."""
-    pass
+import matplotlib.pyplot as plt
+import numpy as np
+from collections import Counter
 
 
 def get_ids(email: str, organisms: list[str], db: str):
@@ -103,14 +100,14 @@ def assembly_stats_report(email: str, terms: list[str],
     handle = None
 
     # Realizar la busqueda de ids
-    ids_orgs = get_ids(Entrez.email, terms, db="Assembly")
+    ids_orgs = get_ids(Entrez.email, terms, db="assembly")
 
     # Obtener los URLs de los reportes de estadisticas
     stats_url_list = []
 
     for id_org in ids_orgs:
         # Obtener el resumen del record
-        handle = Entrez.efetch(db="Assembly", id=id_org,
+        handle = Entrez.efetch(db="assembly", id=id_org,
                                rettype="docsum")
 
         # Obtener su estructura
@@ -265,6 +262,71 @@ def stats_dataframe(email: str, terms: list[str], output=None):
         return stats_df
 
 
+def stats_graph(email: str, terms: list[str], stat: str, output):
+    """Crea una grafica de una de las estadisticas de los ensambles de
+        organismos"""
+
+    # Obtener el dtaframe con los valores de cada ensamble
+    stats_df = stats_dataframe(email, terms)
+
+    # Obtener los valores del estadistico
+    values = stats_df.loc[stat].tolist()
+
+    # Evaluar si se trata de un valor numerico
+    if values[0].isdigit() and stat != "Taxid":
+        # Obtener los nombres de ensambles
+        assemblies_names = stats_df.loc[stat].index.values
+
+        # Cambiar los valores de tipo string a int
+        values = list(map(int, values))
+
+        # Generar la figura
+        fig, ax = plt.subplots()
+
+        # Generar las barras
+        ax.bar(np.arange(len(assemblies_names)), values)
+
+        # Generar los nombres de las barras
+        ax.set_xticks(np.arange(len(assemblies_names)),
+                      labels=assemblies_names)
+
+        # Añadir etiquetas de los ejes y titulo
+        ax.set(xlabel="assemblies", title=stats_df.loc[
+            stat].name)
+
+    # Generar grafica del numero de veces que aparece cada valor
+    else:
+        # Cambiar los valores de tipo string a int
+        val_occurrences = Counter(values)
+
+        stats_vals = list(val_occurrences.keys())
+        val_occurrences = list(val_occurrences.values())
+
+        # Generar la figura
+        fig, ax = plt.subplots()
+
+        # Generar las barras
+        ax.bar(np.arange(len(stats_vals)),
+               val_occurrences)
+
+        # Generar los nombres de las barras
+        ax.set_xticks(np.arange(len(stats_vals)),
+                      labels=stats_vals)
+
+        # Añadir etiquetas de los ejes y titulo
+        ax.set(xlabel=stats_df.loc[
+            stat].name, ylabel="no. of occurrences",
+               title=f"no. of occurrences: {stats_df.loc[stat].name}")
+
+    try:
+        # Guardar figura
+        fig.savefig(output)
+
+    # Imprimir un error si la ruta del output es invalida
+    except IOError as ex:
+        print('El archivo no pudo ser creado: ' + ex.strerror)
+
+
 class AssemblyStatisticsReport(object):
     """
     Clase para almacenar el reporte de las estadisticas de un ensamble.
@@ -293,6 +355,12 @@ class AssemblyStatisticsReport(object):
         return stats_series
 
 
+# Crear la excepcion AmbiguousBaseError
+class AmbiguousError(Exception):
+    """Clase para el manejo de errores de distintos tipos."""
+    pass
+
+
 # Crear la descripcion del programa y asignar clase de formato para
 # poder controlar la descripcion de ayuda
 parser = ArgumentParser(description="Programa que cuenta con "
@@ -310,7 +378,8 @@ parser.add_argument("-f", "--function",
                          "0: get_ids\n"
                          "1: get_tax_data\n"
                          "2: assembly_stats_report\n"
-                         "3: stats_dataframe")
+                         "3: stats_dataframe\n"
+                         "4: stats_graph")
 
 parser.add_argument("-e", "--email",
                     type=str,
@@ -323,7 +392,7 @@ parser.add_argument("-g", "--organisms",
                          "realizara la "
                          "busqueda separados por comas.\nSolo se "
                          "requiere para las "
-                         "funciones 0,2,3")
+                         "funciones 0,2,3,4")
 
 parser.add_argument("-i", "--ids",
                     type=str,
@@ -339,11 +408,17 @@ parser.add_argument("-d", "--data_base",
 parser.add_argument("-o", "--output",
                     type=str,
                     help="Directorio para guardar los archivos "
-                         "generados por las funciones 2,3. \nEn caso "
+                         "generados por las funciones 2,3,4. \nEn caso "
                          "de no proporcionarse la funcion 2 devolvera"
-                         " los resultados en forma de\nlista y la "
+                         " los resultados en forma de\nlista, y la "
                          "funcion"
-                         " 3 en un dataframe")
+                         " 3 en un dataframe. Para la funcion 4 es "
+                         "obligatorio")
+
+parser.add_argument("-s", "--stat",
+                    type=str,
+                    help="Estadistico a buscar, requerido para la "
+                         "funcion 4")
 
 # Ejecutar el metodo parse_args()
 args = parser.parse_args()
@@ -352,7 +427,7 @@ args = parser.parse_args()
 val_errs = []
 try:
     argument = [args.function, args.email, args.organisms, args.ids,
-                args.data_base, args.output]
+                args.data_base, args.output, args.stat]
     invalid = 0
     if argument[0] is None:
         val_errs.append("No se obtuvo la funcion que se desea ejecutar")
@@ -365,9 +440,17 @@ try:
         if argument[3] is None:
             val_errs.append("No se obtuvo la lista de TaxIDs")
             invalid = 1
-    if argument[0] == "0" or argument[0] == "2" or argument[0] == "3":
+    if argument[0] == "0" or argument[0] == "2" or argument[0] == "3"\
+            or argument[0] == "4":
         if argument[2] is None:
             val_errs.append("No se obtuvo la lista de organismos")
+            invalid = 1
+    if argument[0] == "4":
+        if argument[5] is None:
+            val_errs.append("No se obtuvo la direccion para la imagen")
+            invalid = 1
+        if argument[6] is None:
+            val_errs.append("No se obtuvo el estadistico a buscar")
             invalid = 1
     if argument[1] is None:
         val_errs.append("No se obtuvo el email")
@@ -414,6 +497,9 @@ elif function == 3:
         else:
             raise AmbiguousError("La extension del archivo no es "
                                  "csv")
+elif function == 3:
+    stats_graph(args.email, args.organisms.split(
+                ","), args.stat, args.output)
 else:
     raise SystemExit(f"El numero de funcion '{function}' no pertenece a"
                      f" ninguna funcion")
