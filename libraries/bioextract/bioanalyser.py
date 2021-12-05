@@ -26,7 +26,7 @@ CATEGORY
 
 from Bio import Entrez
 from urllib.request import (urlopen, urlretrieve)
-import argparse
+from argparse import ArgumentParser, RawTextHelpFormatter
 from re import match, search
 import pandas as pd
 
@@ -293,21 +293,23 @@ class AssemblyStatisticsReport(object):
         return stats_series
 
 
-# Crear la descripcion del programa
-parser = argparse.ArgumentParser(description="Programa que cuenta con "
-                                             "diferentes funciones "
-                                             "para el analisis y "
-                                             "extraccion de datos de "
-                                             "NCBI")
+# Crear la descripcion del programa y asignar clase de formato para
+# poder controlar la descripcion de ayuda
+parser = ArgumentParser(description="Programa que cuenta con "
+                                    "diferentes funciones "
+                                    "para el analisis y "
+                                    "extraccion de datos de "
+                                    "NCBI",
+                        formatter_class=RawTextHelpFormatter)
 
 # Anadir los argumentos
 parser.add_argument("-f", "--function",
                     type=str,
                     help="Funcion a realizar. Requiere que se indique "
-                         "el numero de la funcion."
-                         "0: get_ids"
-                         "1: get_tax_data"
-                         "2: assembly_stats_report"
+                         "el numero de la funcion.\n"
+                         "0: get_ids\n"
+                         "1: get_tax_data\n"
+                         "2: assembly_stats_report\n"
                          "3: stats_dataframe")
 
 parser.add_argument("-e", "--email",
@@ -319,15 +321,15 @@ parser.add_argument("-g", "--organisms",
                     type=str,
                     help="Lista de terminos con los cuales se "
                          "realizara la "
-                         "busqueda separados por comas. Solo se "
+                         "busqueda separados por comas.\nSolo se "
                          "requiere para las "
                          "funciones 0,2,3")
 
 parser.add_argument("-i", "--ids",
                     type=str,
                     help="Lista de Taxonomy IDs separados por comas de "
-                         "los organismos a buscar. Este parametro solo "
-                         "es necesario para la funcion 1")
+                         "los organismos a buscar.\nEste parametro "
+                         "solo es necesario para la funcion 1")
 
 parser.add_argument("-d", "--data_base",
                     type=str,
@@ -337,10 +339,11 @@ parser.add_argument("-d", "--data_base",
 parser.add_argument("-o", "--output",
                     type=str,
                     help="Directorio para guardar los archivos "
-                         "generados por las funciones 2,3. En caso de "
-                         "no proporcionarse la funcion 2 devolvera los "
-                         "resultados en forma de lista y la funcion 3 "
-                         "en un dataframe")
+                         "generados por las funciones 2,3. \nEn caso "
+                         "de no proporcionarse la funcion 2 devolvera"
+                         " los resultados en forma de\nlista y la "
+                         "funcion"
+                         " 3 en un dataframe")
 
 # Ejecutar el metodo parse_args()
 args = parser.parse_args()
