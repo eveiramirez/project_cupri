@@ -129,10 +129,16 @@ def assembly_stats_report(email: str, terms: list[str],
     if type(download_dir) == str:
         # Crear los archivos de los reportes de cada organismo en el
         # directorio indicado
-        for i, link in enumerate(stats_url_list):
+        try:
+            for i, link in enumerate(stats_url_list):
 
-            # Guardar el archivo con su UID de Assembly como nombre
-            urlretrieve(link, f"{download_dir}/{ids_orgs[i]}.txt")
+                # Guardar el archivo con su UID de Assembly como nombre
+                urlretrieve(link, f"{download_dir}/{ids_orgs[i]}.txt")
+
+        # Imprimir un error si la ruta del input es invalida
+        except IOError as ex:
+            print('Los archivos no pudieron ser creados: ' +
+                  ex.strerror)
     else:
         # Guardar las lineas de cada archivo en un elemento de una lista
         stats_list = []
@@ -175,7 +181,7 @@ parser.add_argument("-e", "--email",
 
 parser.add_argument("-g", "--organisms",
                     type=str,
-                    help="Lista de organismos con los cuales se "
+                    help="Lista de terminos con los cuales se "
                          "realizara la "
                          "busqueda separados por comas. Solo se "
                          "requiere para las "
