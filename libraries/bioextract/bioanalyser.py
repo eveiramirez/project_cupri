@@ -394,6 +394,7 @@ if function == 0:
 elif function == 1:
     print(get_tax_data(args.email, args.ids.split(",")))
 elif function == 2:
+    # Evaluar si se generara un archivo
     if args.output is None:
         print(assembly_stats_report(args.email, args.organisms.split(
             ",")))
@@ -401,10 +402,12 @@ elif function == 2:
         assembly_stats_report(args.email, args.organisms.split(
             ","), args.output)
 elif function == 3:
+    # Evaluar si se generara un archivo
     if args.output is None:
         print(stats_dataframe(args.email, args.organisms.split(
             ",")))
     else:
+        # Revisar que el archivo tenga la extension csv
         if search(r".csv$", args.output):
             stats_dataframe(args.email, args.organisms.split(
                 ","), args.output)
