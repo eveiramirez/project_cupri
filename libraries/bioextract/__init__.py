@@ -29,6 +29,10 @@ CATEGORY
 
 """
 
-from bioanalyser import (get_taxid, get_tax_data, assembly_stats_report)
+from bioanalyser import (get_ids, get_tax_data, assembly_stats_report,
+                         get_stats_dictionary, stats_dataframe,
+                         AssemblyStatisticsReport)
 
-__all__ = ['get_taxid', 'get_tax_data', 'assembly_stats_report', ]
+__all__ = ['get_ids', 'get_tax_data', 'assembly_stats_report',
+           'get_stats_dictionary', 'stats_dataframe',
+           'AssemblyStatisticsReport']
