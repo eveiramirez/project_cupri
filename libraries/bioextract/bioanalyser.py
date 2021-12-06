@@ -355,7 +355,8 @@ def stats_graph(email: str, terms: list[str], stat: str, output,
     for value in values:
         if is_num == 0:
             if type(value) != float:
-                if value.isdigit() and stat != "Taxid":
+                if value.isdigit() and stat != "Taxid" and \
+                        stat != "Sequencing technology":
                     is_num = 1
 
     # Evaluar si se trata de un valor numerico
