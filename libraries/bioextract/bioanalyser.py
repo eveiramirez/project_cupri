@@ -335,7 +335,8 @@ def stats_dataframe(email: str, terms: list[str], output=None):
         return stats_df
 
 
-def stats_graph(email: str, terms: list[str], stat: str, output):
+def stats_graph(email: str, terms: list[str], stat: str, output,
+                width=None, height=None):
     """Crea una grafica de una de las estadisticas de los ensambles de
         organismos"""
 
@@ -368,6 +369,10 @@ def stats_graph(email: str, terms: list[str], stat: str, output):
         # Generar la figura
         fig, ax = plt.subplots()
 
+        # Definir tamano de figura
+        if width and height:
+            fig.set_size_inches(width, height)
+
         # Generar las barras
         ax.bar(np.arange(len(assemblies_names)), values)
 
@@ -389,6 +394,10 @@ def stats_graph(email: str, terms: list[str], stat: str, output):
 
         # Generar la figura
         fig, ax = plt.subplots()
+
+        # Editar tamano de figura
+        if width and height:
+            fig.set_size_inches(width, height)
 
         # Generar las barras
         ax.bar(np.arange(len(stats_vals)),
@@ -512,6 +521,16 @@ parser.add_argument("-s", "--stat",
                     help="Estadistico a buscar, requerido para la "
                          "funcion 4")
 
+parser.add_argument("-w", "--width",
+                    type=str,
+                    help="Valor del ancho para la "
+                         "funcion 4")
+
+parser.add_argument("-t", "--height",
+                    type=str,
+                    help="Valor de la altura para la "
+                         "funcion 4")
+
 # Ejecutar el metodo parse_args()
 args = parser.parse_args()
 
@@ -519,7 +538,8 @@ args = parser.parse_args()
 val_errs = []
 try:
     argument = [args.function, args.email, args.organisms, args.ids,
-                args.data_base, args.output, args.stat]
+                args.data_base, args.output, args.stat,
+                args.width, args.height]
     invalid = 0
     if argument[0] is None:
         val_errs.append("No se obtuvo la funcion que se desea ejecutar")
@@ -544,6 +564,16 @@ try:
         if argument[6] is None:
             val_errs.append("No se obtuvo el estadistico a buscar")
             invalid = 1
+        if argument[7] is None:
+            if argument[8]:
+                val_errs.append("No se obtuvo el valor del ancho de "
+                                "la figura")
+                invalid = 1
+        if argument[8] is None:
+            if argument[7]:
+                val_errs.append("No se obtuvo el valor de la altura "
+                                "de la figura")
+                invalid = 1
     if argument[1] is None:
         val_errs.append("No se obtuvo el email")
         invalid = 1
@@ -590,8 +620,11 @@ elif function == 3:
             raise AmbiguousError("La extension del archivo no es "
                                  "csv")
 elif function == 4:
-    stats_graph(args.email, args.organisms.split(
-                ","), args.stat, args.output)
+    if args.height:
+
+        stats_graph(args.email, args.organisms.split(
+                ","), args.stat, args.output, float(args.width),
+                    float(args.height))
 else:
     raise SystemExit(f"El numero de funcion '{function}' no pertenece a"
                      f" ninguna funcion")
