@@ -307,14 +307,22 @@ def stats_dataframe(email: str, terms: list[str], output=None):
     # Guardar las estadisticas de los ensambles
     stats_df = pd.DataFrame(index=i_list)
 
+    # Generar lista de dataframes
+    df_list = [stats_df]
+
+    # Obtener dataframes
     for stats in dictionaries:
         stats_series = pd.Series(stats.values(), index=stats.keys(),
                                  name=stats["Assembly name"])
+        # Generar dataframe de Series
+        dict_df = pd.DataFrame({stats_series.name: stats_series})
+        # Guardar el dataframe
+        df_list.append(dict_df)
 
-        stats_df[stats_series.name] = stats_series
+    # Unir dataframes
+    stats_df = pd.concat(df_list, axis=1)
 
     # Evaluar si se se guardara el dataframe en un archivo csv
-
     if type(output) == str:
         try:
             # Crear el archivo del dataframe en formato csv
