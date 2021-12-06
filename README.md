@@ -58,11 +58,13 @@ Dejando en claro que para la informacion presente en estos resultados no se cons
 Los datos de los resultados principales pueden observarse de manera ordenada dentro de nuestro apartado de Data en un archivo CSV, ahi se contiene informacion esencial como lo fue el numero total de nucleotidos del genoma, asi como si este se encuentra cerrado o abierto, el porcentaje de CG, tambien el numero de gaps y scaffolds, asi como la tecnologia por la cual fue secuenciada, el ano de publicacion o el instituto o centro de investigacion que ha publicado la informacion; claro tambien una de los aspectos mas importantes como lo son las especies especificas dentro del genero.  
 
 **Visualizando el tamano de genoma para cada uno de los organismos secuenciados e identificados**
+
 Dentro de los resultados hemos observado por ejemplo una gran diferencia entre el genoma mas pequeno del genero y el mas grande, siendo estos: ASM782943v1 como el mas pequeno con un total de 4879332 nucleotidos siendo esta perteneciente a la especie Cupriavidus gilardii y el mas grande ha sido ASM74409v1 perteneciente a la especie Cupriavidus necator de la cepa A5-1; como podemos observar es una diferencia gigantesca de 4862044 nucleotidos o sea que es practicamente el doble de grande, esto es muy llamativo ya que como ya hemos mencionado las bacterias son apenas diferenciables dentro del genero, pero en este caso son bastante distintas.
 ![image](https://user-images.githubusercontent.com/60999318/144784947-92d1fbb6-550d-4651-b9ef-17f2274bad66.png)
 
 
 **Numero de representaciones de especies cupriavidus**
+
 Las especies con mayor numero de representantes identificados han sido taiwanensis, metalladurans y necator, esto debe ser por su importancia en ambitos de investigacion reciente como puede ser la biorremediacion, o como especies simbioticas con plantas. 
 
 ![image](https://user-images.githubusercontent.com/60999318/144790299-7236ec7c-4023-4f23-8e55-f39184220532.png)
