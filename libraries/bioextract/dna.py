@@ -1,185 +1,222 @@
-"""
-MODULE NAME
-        dna
+"" "
+NOMBRE
+       Numpy.py
+VERSIÓN
+       0.2
+AUTOR
+        Diego Montes Gabriel << dmontes@lcg.unam.mx >>
+DESCRIPCIÓN 
+        Accedemos a Bacdive a traves del uso de keycloack
+CATEGORÍA
+        Analizador de bases de datos 
+GITHUB
+     https://github.com/eveiramirez/project_cupri/edit/master/libraries/bioextract/dna.py
+      
+APORTE 
+  Usuario y contrasena de Bacdive, ademas de la informacion de nuestra especie a buscar 
+        (en nuestro caso cupriavidus)
+PRODUCCIÓN 
+    3 arrays distintos en uno contendremos los costos, en los que se contendra la produccion,
+    los costos y los costos por g / L 
+EJEMPLOS
+  Aporte:
+   client = bacdive.BacdiveClient('montes355@gmail.com', 'Casuario2706')
+   query = {"taxonomy": "Cupriavidus"}
+  Resultado:
+        '1162': [{'Cupriavidus': ['sintetizer', 'Bacteria']},
+          {'culture collection no.': 'DSM 4514, ATCC 37015, BD170, NCIB 11624, '
+                                     'pUB110'}]
+"" "
 
-VERSION
-        [0.0.1]
-
-PYTHON VERSION
-        3.9
-
-AUTHORS
-        Diego
-
-CONTACT
-        iramirez@lcg.unam.mx
-
-DESCRIPTION
-        Modulo para la obtencion de informacion de genomas.
-
-CATEGORY
-        DNA
-"""
-
-from bs4 import BeautifulSoup
+from keycloak.exceptions import KeycloakAuthenticationError
+from keycloak import KeycloakOpenID
 import requests
 import json
 
-failed = []
-main = {}
-with open('archaea.txt') as m:
-    main = json.load(m)
+
+class BacdiveClient():
+    def __init__(self, user, password, public=True):
+        ''' Initialize client and authenticate on the server '''
+        self.result = {}
+        self.public = public
+
+        client_id = "api.bacdive.public"
+        if self.public:
+            server_url = "https://sso.dsmz.de/auth/"
+        else:
+            server_url = "https://sso.dmz.dsmz.de/auth/"
+        try:
+            self.keycloak_openid = KeycloakOpenID(
+                server_url=server_url,
+                client_id=client_id,
+                realm_name="dsmz")
+
+            # Get tokens
+            token = self.keycloak_openid.token(user, password)
+            self.access_token = token['access_token']
+            self.refresh_token = token['refresh_token']
+            print("-- Authentication successful --")
+        except KeycloakAuthenticationError as e:
+            print("ERROR - Authentication failed:", e)
+
+    def do_api_call(self, url):
+        ''' Initialize API call on given URL and returns result as json '''
+        if self.public:
+            baseurl = "https://api.bacdive.dsmz.de/"
+        else:
+            baseurl = "http://api.bacdive-dev.dsmz.local/"
+        
+        if not url.startswith("http"):
+            # if base is missing add default:
+            url = baseurl + url
+        resp = self.do_request(url)
+
+        if resp.status_code == 500 or resp.status_code == 400:
+            return json.loads(resp.content)
+        elif (resp.status_code == 401):
+            msg = json.loads(resp.content)
+
+            if msg['message'] == "Expired token":
+                # Access token might have expired (15 minutes life time).
+                # Get new tokens using refresh token and try again.
+                token = self.keycloak_openid.refresh_token(self.refresh_token)
+                self.access_token = token['access_token']
+                self.refresh_token = token['refresh_token']
+                return self.do_api_call(url)
+
+            return msg
+        else:
+            return json.loads(resp.content)
+
+    def do_request(self, url):
+        ''' Perform request with authentication '''
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer {token}".format(token=self.access_token)
+        }
+
+        resp = requests.get(url, headers=headers)
+        return resp
 
 
-def find_info(key):
-    if main[key]['link'][0:4] != "http":
-        main[key]['link'] = "https://www.ncbi.nlm.nih.gov/Taxonomy" \
-                            "/Browser/" + main[key]['link']
-    r = requests.get(main[key]['link'])
+    def filterResult(self, d, keys):
+        ''' Helper function to filter nested dict by keys '''
+        if not isinstance(d, dict):
+            yield None
+        for k, v in d.items():
+            if k in keys:
+                yield {k: v}
+            if isinstance(v, dict):
+                yield from self.filterResult(v, keys)
+            elif isinstance(v, list):
+                for i in v:
+                    if isinstance(i, dict):
+                        yield from self.filterResult(i, keys)
 
-    main_page = BeautifulSoup(r.content, 'html5lib')
+    def retrieve(self, filter=None):
+        ''' Yields all the received entries and does next call if result is incomplete '''
+        ids = ";".join([str(i) for i in self.result['results']])
+        entries = self.do_api_call('fetch/'+ids)['results']
+        for el in entries:
+            if isinstance(el, dict):
+                entry = el
+                el = entry.get("id")
+            else:
+                entry = entries[el]
+            if filter:
+                entry = {el: [i for i in self.filterResult(entry, filter)]}
+            yield entry
+        if self.result['next']:
+            self.result = self.do_api_call(self.result['next'])
+            yield from self.retrieve(filter)
 
-    information = main_page.find("form").find("table").find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find("td")
+    def getIDByCultureno(self, culturecolnumber):
+        ''' Initialize search by culture collection number '''
+        item = culturecolnumber.strip()
+        result = self.do_api_call('culturecollectionno/'+str(item))
+        return result
 
-    lin = information.find("dd").find_all("a")
-    lineage = []
-    for taxa in lin:
-        lineage.append(taxa.text)
+    def getIDsByTaxonomy(self, genus, species_epithet=None, subspecies_epithet=None):
+        ''' Initialize search by taxonomic names '''
+        item = genus.strip()
+        if species_epithet:
+            item += "/" + species_epithet
+            if subspecies_epithet:
+                item += "/" + subspecies_epithet
+        result = self.do_api_call("taxon/"+item)
+        return result
 
-    rank = information.find("h2").find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().text
+    def getIDsBy16S(self, seq_acc_num):
+        ''' Initialize search by 16S sequence accession '''
+        item = seq_acc_num.strip()
+        result = self.do_api_call('sequence_16s/'+str(item))
+        return result
 
-    main[key]["lineage"] = lineage
-    main[key]["rank"] = rank
+    def getIDsByGenome(self, seq_acc_num):
+        ''' Initialize search by genome sequence accession '''
+        item = seq_acc_num.strip()
+        result = self.do_api_call('sequence_genome/'+str(item))
+        return result
 
-    bacdive = main_page.find(href="http://bacdive.dsmz.de/")
-    gold = main_page.find(href="http://genomesonline.org")
-    oma = main_page.find(href="http://omabrowser.org")
-    print("general success!")
-    try:
-        bacdive_link = bacdive.parent.parent.find("a")["href"]
-        bd = requests.get(bacdive_link)
-        bacdive_page = BeautifulSoup(bd.content, 'html5lib')
-        sections = bacdive_page.find(id="content")
-        # section 1 (no subtables needed)
-        oxygen_tolerance = sections.find(attrs={"data-src-tbl": "oxygen_tolerance"})
-        if oxygen_tolerance != None:
-            oxygen_tolerance = oxygen_tolerance.find_next_sibling().find_next_sibling().text
+    def search(self, **params):
+        ''' Initialize search with *one* of the following parameters:
+        
+        id -- BacDive-IDs either as a semicolon seperated string or list
+        taxonomy -- Taxonomic names either as string or list
+        sequence -- Sequence accession number of unknown type
+        genome -- Genome sequence accession number
+        16s -- 16S sequence accession number
+        culturecolno -- Culture collection number (mind the space!)
+        '''
+        params = list(params.items())
+        allowed = ['id', 'taxonomy', 'sequence',
+                   'genome', '16s', 'culturecolno']
+        if len(params) != 1:
+            print(
+                "ERROR: Exacly one parameter is required. Please choose one of the following:")
+            print(", ".join(allowed))
+            return 0
+        querytype, query = params[0]
+        querytype = querytype.lower()
+        if querytype not in allowed:
+            print(
+                "ERROR: The given query type is not allowed. Please choose one of the following:")
+            print(", ".join(allowed))
+            return 0
+        if querytype == 'id':
+            if type(query) == type(""):
+                query = query.split(';')
+            self.result = {'count': len(query), 'next': None,
+                           'previous': None, 'results': query}
+        elif querytype == 'taxonomy':
+            if type(query) == type(""):
+                query = [i for i in query.split(" ") if i != "subsp."]
+            if len(query) > 3:
+                print("Your query contains more than three taxonomical units.")
+                print(
+                    "This query supports only genus, species epithet (optional), and subspecies (optional).")
+                print("They can be defined as list, tuple or string (space separated).")
+                return 0
+            self.result = self.getIDsByTaxonomy(*query)
+        elif querytype == 'sequence':
+            self.result = self.getIDsByGenome(query)
+            if self.result['count'] == 0:
+                self.result = self.getIDsBy16S(query)
+        elif querytype == 'genome':
+            self.result = self.getIDsByGenome(query)
+        elif querytype == '16s':
+            self.result = self.getIDsBy16S(query)
+        elif querytype == 'culturecolno':
+            self.result = self.getIDByCultureno(query)
 
-        # section 2
-        table = sections.find(id="temp_table") #subtable1
-        culture_temperature = table.find(attrs={"data-src-tbl": "culture_temp"})
-        if culture_temperature != None:
-            culture_temperature = culture_temperature.find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().text
-        table = sections.find(id="temp_range") #subtable2
-        temperature_range = table.find(attrs={"data-src-tbl": "culture_temp"})
-        if temperature_range != None:
-            temperature_range = temperature_range.find_next_sibling().find_next_sibling().text
-
-        # section 3
-        table = sections.find(attrs={"class": "id_4 section expandsection"}).find_all("tr")
-        location = table[1].find(attrs={"data-src-tbl": "origin"})
-        if location != None:
-            location = location.find_next_sibling().find_next_sibling().text
-        country = table[2].find(attrs={"data-src-tbl": "origin"})
-        if country != None:
-            country = country.find_next_sibling().find_next_sibling().text
-        continent = table[3].find(attrs={"data-src-tbl": "origin"})
-        if continent != None:
-            continent = continent.find_next_sibling().find_next_sibling().text
-
-        # section 4
-        biosafety_level_A = sections.find(attrs={"data-src-tbl": "risk_assessment"}).find_next_sibling().find_next_sibling().text
-        """
-        print(oxygen_tolerance)
-        print(culture_temperature)
-        print(temperature_range)
-        print(location)
-        print(country)
-        print(continent)
-        print(biosafety_level_A)
-        """
-        main[key]["oxygen"] = oxygen_tolerance
-        main[key]["temperature"] = culture_temperature
-        main[key]["temperature_range"] = temperature_range
-        main[key]["location_1"] = location
-        main[key]["location_2"] = country
-        main[key]["location_3"] = continent
-        main[key]["biosafety_A"] = biosafety_level_A
-        print("b success!")
-    except:
-        print("failed to retrieve bacdive data for: " + k + ":" +
-              main[k]["name"])
-        failed.append("failed to retrieve bacdive data for: " + k + ":"
-                      + main[k]["name"])
-    try:
-        gold_link = gold.parent.parent.find("a")["href"]
-        gd = requests.get(gold_link)
-        gold_page = BeautifulSoup(gd.content, 'html5lib')
-        table = gold_page.find(id="OrganismInformation").find("tbody").find_all("tr")
-
-        organism_type = table[18].find("td").find_next_sibling().text.strip()
-        is_cultured = table[19].find("td").find_next_sibling().text.strip()
-        culture_type = table[20].find("td").find_next_sibling().text.strip()
-        biosafety_level_b = table[22].find("td").find_next_sibling().text.strip()
-        is_public = table[27].find("td").find_next_sibling().text.strip()
-        """
-        print(organism_type)
-        print(is_cultured)
-        print(culture_type)
-        print(biosafety_level_b)
-        print(is_public)
-        """
-        main[key]["organism_type"] = organism_type
-        main[key]["is_cultured"] = is_cultured
-        main[key]["culture_type"] = culture_type
-        main[key]["biosafety_B"] = biosafety_level_b
-        main[key]["is_public"] = is_public
-        print("g success!")
-    except:
-        print("failed to retrieve gold data for: " + k + ":" +
-              main[k]["name"])
-        failed.append("failed to retrieve gold data for: " + k + ":" +
-                      main[k]["name"])
-    try:
-        oma_link = oma.parent.parent.find("a")["href"]
-        oa = requests.get(oma_link)
-        oma_page = BeautifulSoup(oa.content, 'html5lib')
-        body = oma_page.find_all("dd")
-
-        sequence_number = body[-4].string
-        matrix_protein = body[-3].string
-        amino = body[-2].string
-        protein_length = body[-1].string
-        """
-        print(sequence_number)
-        print(matrix_protein)
-        print(amino)
-        print(protein_length)
-        """
-        main[key]["sequence_number"] = sequence_number
-        main[key]["matrix_protein"] = matrix_protein
-        main[key]["amino"] = amino
-        main[key]["protein_length"] = protein_length
-        print("o success!")
-    except:
-        print("failed to retrieve oma data for: " + k + ":" +
-              main[k]["name"])
-        failed.append("failed to retrieve oma data for: " + k + ":" +
-                      main[k]["name"])
-
-
-count = 1
-for k in main:
-    try:
-        find_info(k)
-        print(count)
-    except:
-        print("failed to retrieve general data for: " + k)
-        failed.append("failed to retrieve general data for: " + k)
-    count += 1
-
-with open('archaea_master_dict.txt', 'w') as n:
-    json.dump(main, n)
-
-with open('failed_data.txt', 'w') as n:
-    json.dump(failed, n)
+        if not self.result:
+            print("ERROR: Something went wrong. Please check your query and try again")
+            return 0
+        if not 'count' in self.result:
+            print("ERROR:", self.result.get("title"))
+            print(self.result.get("message"))
+            return 0
+        if self.result['count'] == 0:
+            print("Your search did not receive any results.")
+            return 0
+        return self.result['count']
