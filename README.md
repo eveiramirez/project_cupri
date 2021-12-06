@@ -1,7 +1,8 @@
 # project_cupri
 
 
-## INTRODUCCION
+## INTRODUCCION 
+
 En este proyecto se trabajo con las herramientas aprendidas durante el curso de Biopython de la licenciatura de ciencias genomicas,cursado durante el tercer semestre, perteneciente a la generacion 2021, el proposito principal fue representar las habilidades aprendidas en el curso, ademas de esto se ha desarrollado un proyecto interno en relacion a cupriavidus, un genero de bacterias que recientemente ha ingerido a otro genero como lo fue Wautersia, por lo que nos interesa saber su similitud, determinando su tamano de genoma, la propia taxonomia; asi como una serie de datos mas como los centros de investigacion donde se han secuenciado las bacterias o tecnologias por las que se han secuenciado.
 Un poco sobre cupriavidus:
 
@@ -19,17 +20,34 @@ Miembros del genero Cupriavidus han sido aislados de diversos ambientes ecologic
 
 Se han encontrado una variedad de funciones fisiologicas en los miembros del genero Cupriavidus; por ejemplo, Cupriavidus taiwanensis puede nodular diferentes especies de leguminosas (da Silva et al, 2012), ademas  algunas especies poseen características de promoción del crecimiento de las plantas, como la secreción de ácido indol acetico y sideroforos y la solubilizacion del fosfato (Pongsilp et al,2012), y aun mas interesante se ha informado que Cupriavidus pampae y C. numazuensis degradan contaminantes organicos como el acido 4- (2,4-diclorofenoxi) butírico (2,4-DB) y el tricloroetileno.
 
-## Metodologia
+## Metodologia 
+Para poder obtener las comparaciones de especies de Cupriavidus, desarrollamos una paqueteria la cual contiene un modulo al que se le dio el nombre de bioanalyser, el cual permite generar principalmente analisis de datos estadisticos obtenidos de ensambles. Este modulo contiene distintas funciones y una unica clase, las cuales obtienen su informacion de NCBI.
 
+En nuestro analisis empleamos unicamente las funciones stats_dataframe y stats_graph.
 
-## Pregunta
+Con la funcion stats_dataframe generamos un archivo con extension csv el cual comparo las estadisticas de los reportes de los ensambles de todas las especies de Cupriavidus, excluyendo a los Cupriavidus no clasificados y a los provenientes de muestras ambientales.
+Mediante la funcion stats_graph generamos graficas de los valores de las estadisticas, donde comparamos el numero de ocurrencias para las estadisticos que no eran valores numericos, y comparamos el valor de los estadisticos que si eran numericos. Los estadisticos que comparamos fueron los siguientes: longitud total del ensamble, nombres de los organismos, nivel del ensamble, representacion del genoma, metodos de ensamble, cobertura del genoma, tecnologias de secuenciacion, y los submitters
+
+Para generar estas graficas requerimos el uso de los siguientes comandos desde terminal
+python bioanalyser.py -f 4 -g "Cupriavidus agavae,Cupriavidus alkaliphilus,Cupriavidus basilensis,Cupriavidus campinensis,Cupriavidus cauae,Cupriavidus gilardii,Cupriavidus lacunae,Cupriavidus laharis,Cupriavidus malaysiensis,Cupriavidus metallidurans,Cupriavidus nantongensis,Cupriavidus necator,Cupriavidus neocaledonicus,Cupriavidus numazuensis,Cupriavidus oxalaticus,Cupriavidus pampae,Cupriavidus pauculus,Cupriavidus pinatubonensis,Cupriavidus plantarum,Cupriavidus respiraculi,Cupriavidus taiwanensis,Cupriavidus yeoncheonensis" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_total_length.png -s "total-length" -w 30 -t 10
+python bioanalyser.py -f 4 -g "Cupriavidus agavae,Cupriavidus alkaliphilus,Cupriavidus basilensis,Cupriavidus campinensis,Cupriavidus cauae,Cupriavidus gilardii,Cupriavidus lacunae,Cupriavidus laharis,Cupriavidus malaysiensis,Cupriavidus metallidurans,Cupriavidus nantongensis,Cupriavidus necator,Cupriavidus neocaledonicus,Cupriavidus numazuensis,Cupriavidus oxalaticus,Cupriavidus pampae,Cupriavidus pauculus,Cupriavidus pinatubonensis,Cupriavidus plantarum,Cupriavidus respiraculi,Cupriavidus taiwanensis,Cupriavidus yeoncheonensis" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_organism_name.png -s "Organism name" -w 30 -t 10
+python bioanalyser.py -f 4 -g "Cupriavidus agavae,Cupriavidus alkaliphilus,Cupriavidus basilensis,Cupriavidus campinensis,Cupriavidus cauae,Cupriavidus gilardii,Cupriavidus lacunae,Cupriavidus laharis,Cupriavidus malaysiensis,Cupriavidus metallidurans,Cupriavidus nantongensis,Cupriavidus necator,Cupriavidus neocaledonicus,Cupriavidus numazuensis,Cupriavidus oxalaticus,Cupriavidus pampae,Cupriavidus pauculus,Cupriavidus pinatubonensis,Cupriavidus plantarum,Cupriavidus respiraculi,Cupriavidus taiwanensis,Cupriavidus yeoncheonensis" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_assembly_level.png -s "Assembly level" -w 30 -t 10
+python bioanalyser.py -f 4 -g "" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_genome_representation.png -s "Genome representation" -w 6 -t 10
+python bioanalyser.py -f 4 -g "" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_assembly_method.png -s "Assembly method" -w 30 -t 10
+python bioanalyser.py -f 4 -g "" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_genome_coverage.png -s "Genome coverage" -w 30 -t 10
+python bioanalyser.py -f 4 -g "" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_sequencing_technology.png -s "Sequencing technology" -w 30 -t 10
+
+Para la generacion del archivo csv que es una tabla de todas las estadisticas, se requirio el siguiente comando
+python bioanalyser.py -f 3 -g "" -e iramirez@lcg.unam.mx -o data/Cupriavidus_Assemblies_Stats.csv
+
+## Pregunta 
 
 
 **Podemos obtener información de las distintas características entre las diversas especies de Cupriavidus mediante el uso de librerías de Python?**
 El objetivo a niveles generales es obtener la mayor cantidad posible de informacion que nos puede ofrecer NCBI sobre el genero cupriavidus. 
 
 
-## Resultados 
+## Resultados  
 Dejando en claro que para la informacion presente en estos resultados no se consideraron las Cupriavidus no clasificadas y las de muestra ambiente; asi que no influyen en la informacio presentada dentro de este contenido. 
 Los datos de los resultados principales pueden observarse de manera ordenada dentro de nuestro apartado de Data en un archivo CSV, ahi se contiene informacion esencial como lo fue el numero total de nucleotidos del genoma, asi como si este se encuentra cerrado o abierto, el porcentaje de CG, tambien el numero de gaps y scaffolds, asi como la tecnologia por la cual fue secuenciada, el ano de publicacion o el instituto o centro de investigacion que ha publicado la informacion; claro tambien una de los aspectos mas importantes como lo son las especies especificas dentro del genero.  
 
