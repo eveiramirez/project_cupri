@@ -95,6 +95,7 @@ Aqui podemos observar que nuevamente, por lo regular no se reporta la tecnologia
 ![image](https://user-images.githubusercontent.com/60999318/144792026-0905d611-64fe-4299-a785-b74d85a48628.png)
 
 
+**Cobertura de genoma**
 Observamos que existe una gran variacion de la precision de la secuenciacion entre los distintos organismos de Cupriavidus.
 
 ![image](https://user-images.githubusercontent.com/60999318/144794891-d6cc7f9b-b73f-4575-9919-498d4d12c888.png)
