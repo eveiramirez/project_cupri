@@ -229,24 +229,21 @@ def stats_dataframe(email: str, terms: list[str], output=None):
     # Obtener los diccionarios de las estadisticas
     dictionaries = get_stats_dictionary(stats_reports)
 
-    # Obtener la serie de los primeros estadisticos del primer
-    # organismo para crear el dataframe
-    stats_series = pd.Series(dictionaries[0].values(),
-                             index=dictionaries[0].keys(),
-                             name=dictionaries[0]["Assembly name"])
+    # Crear la lista de las filas
+    i_list = []
 
-    # Crear dataframe
-    stats_df = pd.DataFrame({stats_series.name: stats_series})
+    # Obtener todos los indices de las filas
+    for stats in dictionaries:
+        i_list = list(set(list(stats.keys())+i_list))
 
-    # Verificar que existan mas diccionarios
-    if len(dictionaries) > 1:
-        # Guardar las estadisticas de los otros ensambles
-        for stats in dictionaries[1:]:
-            stats_series = pd.Series(stats.values(),
-                                     index=stats.keys(),
-                                     name=stats["Assembly name"])
-            # Unir
-            stats_df[stats_series.name] = stats_series
+    # Guardar las estadisticas de los ensambles
+    stats_df = pd.DataFrame(index=i_list)
+
+    for stats in dictionaries:
+        stats_series = pd.Series(stats.values(), index=stats.keys(),
+                                 name=stats["Assembly name"])
+
+        stats_df[stats_series.name] = stats_series
 
     # Evaluar si se se guardara el dataframe en un archivo csv
 
@@ -272,8 +269,16 @@ def stats_graph(email: str, terms: list[str], stat: str, output):
     # Obtener los valores del estadistico
     values = stats_df.loc[stat].tolist()
 
+    # Verificar si se trata de un valor numerico
+    is_num = 0
+    for value in values:
+        if is_num == 0:
+            if type(value) != float:
+                if value.isdigit() and stat != "Taxid":
+                    is_num = 1
+
     # Evaluar si se trata de un valor numerico
-    if values[0].isdigit() and stat != "Taxid":
+    if is_num:
         # Obtener los nombres de ensambles
         assemblies_names = stats_df.loc[stat].index.values
 
