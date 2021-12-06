@@ -267,7 +267,11 @@ def stats_graph(email: str, terms: list[str], stat: str, output):
     stats_df = stats_dataframe(email, terms)
 
     # Obtener los valores del estadistico
-    values = stats_df.loc[stat].tolist()
+    try:
+        values = stats_df.loc[stat].tolist()
+    except KeyError:
+        raise SystemExit("El estadistico no se encuentra en los "
+                         "organismos")
 
     # Verificar si se trata de un valor numerico
     is_num = 0
