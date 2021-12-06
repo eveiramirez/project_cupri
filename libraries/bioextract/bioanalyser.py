@@ -3,7 +3,7 @@ MODULE NAME
         bioanalyser
 
 VERSION
-        [0.0.1]
+        [1.0.0]
 
 PYTHON VERSION
         3.9
