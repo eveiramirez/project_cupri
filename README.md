@@ -6,17 +6,17 @@
 En este proyecto se trabajo con las herramientas aprendidas durante el curso de Biopython de la licenciatura de ciencias genomicas,cursado durante el tercer semestre, perteneciente a la generacion 2021, el proposito principal fue representar las habilidades aprendidas en el curso, ademas de esto se ha desarrollado un proyecto interno en relacion a cupriavidus, un genero de bacterias que recientemente ha ingerido a otro genero como lo fue Wautersia, por lo que nos interesa saber su similitud, determinando su tamano de genoma, la propia taxonomia; asi como una serie de datos mas como los centros de investigacion donde se han secuenciado las bacterias o tecnologias por las que se han secuenciado.
 Un poco sobre cupriavidus:
 
-**En qué consiste el género Cupriavidus?**
+**En que consiste el genero Cupriavidus?**
 
 Cupriavidus es un genero de bacterias, estas bacterias se caracterizan por ser del tipo Gram-negativas; normalmente tienen forma de “baston” y poseen flagelos, ademas de ser organismos aeróbicos obligatorios, y son quimioorganotróficos o quimiolitotroficos.   El género Cupriavidus fue propuesto en 1987 por Makkar y Casida quienes describieron un depredador bacteriano no obligado de bacterias en el suelo como Cupriavidus necator ( Makkar & Casida, 1987), que fue la primera especie encontrada del genero Cupriavidus, este género está formado por 17 especies distintas, tomando en cuenta que Wautersia (un género que se integró a Cupriavidus en 2005, porque se determinó que era igual al genero Cupriavidus ya existente), asi que no es un genero extremadamente grande. Cabe aclarar que son 17 especies reconocidas por la comunidad cientifica, pero que es muy  complicado diferenciar especies dentro del dominio de las bacterias (diferenciadas principalmente por  las secuencias del gen de ARNr 16S) así que si bien tenemos más estudios que intentan el reconocimiento de nuevas especies, no han sido oficializadas.
 
 
-**Cuál es el ambiente óptimo de este género bacteriano?** 
+**Cuál es el ambiente optimo de este genero bacteriano?** 
 
 Miembros del genero Cupriavidus han sido aislados de diversos ambientes ecologicos como suelo, agua, sedimentos de estanques, nodulos de leguminosas, depositos de flujo de lodo volcanico y fuentes clínicas humanas. 
 
 
-**Y por qué sería de interés este género para considerar su estudio?** 
+**Y por que seria de interes este genero para considerar su estudio?** 
 
 Se han encontrado una variedad de funciones fisiologicas en los miembros del genero Cupriavidus; por ejemplo, Cupriavidus taiwanensis puede nodular diferentes especies de leguminosas (da Silva et al, 2012), ademas  algunas especies poseen características de promoción del crecimiento de las plantas, como la secreción de ácido indol acetico y sideroforos y la solubilizacion del fosfato (Pongsilp et al,2012), y aun mas interesante se ha informado que Cupriavidus pampae y C. numazuensis degradan contaminantes organicos como el acido 4- (2,4-diclorofenoxi) butírico (2,4-DB) y el tricloroetileno.
 
@@ -32,18 +32,17 @@ Para generar estas graficas requerimos el uso de los siguientes comandos desde t
 python bioanalyser.py -f 4 -g "Cupriavidus agavae,Cupriavidus alkaliphilus,Cupriavidus basilensis,Cupriavidus campinensis,Cupriavidus cauae,Cupriavidus gilardii,Cupriavidus lacunae,Cupriavidus laharis,Cupriavidus malaysiensis,Cupriavidus metallidurans,Cupriavidus nantongensis,Cupriavidus necator,Cupriavidus neocaledonicus,Cupriavidus numazuensis,Cupriavidus oxalaticus,Cupriavidus pampae,Cupriavidus pauculus,Cupriavidus pinatubonensis,Cupriavidus plantarum,Cupriavidus respiraculi,Cupriavidus taiwanensis,Cupriavidus yeoncheonensis" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_total_length.png -s "total-length" -w 30 -t 10
 python bioanalyser.py -f 4 -g "Cupriavidus agavae,Cupriavidus alkaliphilus,Cupriavidus basilensis,Cupriavidus campinensis,Cupriavidus cauae,Cupriavidus gilardii,Cupriavidus lacunae,Cupriavidus laharis,Cupriavidus malaysiensis,Cupriavidus metallidurans,Cupriavidus nantongensis,Cupriavidus necator,Cupriavidus neocaledonicus,Cupriavidus numazuensis,Cupriavidus oxalaticus,Cupriavidus pampae,Cupriavidus pauculus,Cupriavidus pinatubonensis,Cupriavidus plantarum,Cupriavidus respiraculi,Cupriavidus taiwanensis,Cupriavidus yeoncheonensis" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_organism_name.png -s "Organism name" -w 30 -t 10
 python bioanalyser.py -f 4 -g "Cupriavidus agavae,Cupriavidus alkaliphilus,Cupriavidus basilensis,Cupriavidus campinensis,Cupriavidus cauae,Cupriavidus gilardii,Cupriavidus lacunae,Cupriavidus laharis,Cupriavidus malaysiensis,Cupriavidus metallidurans,Cupriavidus nantongensis,Cupriavidus necator,Cupriavidus neocaledonicus,Cupriavidus numazuensis,Cupriavidus oxalaticus,Cupriavidus pampae,Cupriavidus pauculus,Cupriavidus pinatubonensis,Cupriavidus plantarum,Cupriavidus respiraculi,Cupriavidus taiwanensis,Cupriavidus yeoncheonensis" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_assembly_level.png -s "Assembly level" -w 30 -t 10
-python bioanalyser.py -f 4 -g "" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_genome_representation.png -s "Genome representation" -w 6 -t 10
-python bioanalyser.py -f 4 -g "" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_assembly_method.png -s "Assembly method" -w 30 -t 10
-python bioanalyser.py -f 4 -g "" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_genome_coverage.png -s "Genome coverage" -w 30 -t 10
-python bioanalyser.py -f 4 -g "" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_sequencing_technology.png -s "Sequencing technology" -w 30 -t 10
+python bioanalyser.py -f 4 -g "Cupriavidus agavae,Cupriavidus alkaliphilus,Cupriavidus basilensis,Cupriavidus campinensis,Cupriavidus cauae,Cupriavidus gilardii,Cupriavidus lacunae,Cupriavidus laharis,Cupriavidus malaysiensis,Cupriavidus metallidurans,Cupriavidus nantongensis,Cupriavidus necator,Cupriavidus neocaledonicus,Cupriavidus numazuensis,Cupriavidus oxalaticus,Cupriavidus pampae,Cupriavidus pauculus,Cupriavidus pinatubonensis,Cupriavidus plantarum,Cupriavidus respiraculi,Cupriavidus taiwanensis,Cupriavidus yeoncheonensis" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_assembly_method.png -s "Assembly method" -w 30 -t 10
+python bioanalyser.py -f 4 -g "Cupriavidus agavae,Cupriavidus alkaliphilus,Cupriavidus basilensis,Cupriavidus campinensis,Cupriavidus cauae,Cupriavidus gilardii,Cupriavidus lacunae,Cupriavidus laharis,Cupriavidus malaysiensis,Cupriavidus metallidurans,Cupriavidus nantongensis,Cupriavidus necator,Cupriavidus neocaledonicus,Cupriavidus numazuensis,Cupriavidus oxalaticus,Cupriavidus pampae,Cupriavidus pauculus,Cupriavidus pinatubonensis,Cupriavidus plantarum,Cupriavidus respiraculi,Cupriavidus taiwanensis,Cupriavidus yeoncheonensis" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_genome_coverage.png -s "Genome coverage" -w 30 -t 10
+python bioanalyser.py -f 4 -g "Cupriavidus agavae,Cupriavidus alkaliphilus,Cupriavidus basilensis,Cupriavidus campinensis,Cupriavidus cauae,Cupriavidus gilardii,Cupriavidus lacunae,Cupriavidus laharis,Cupriavidus malaysiensis,Cupriavidus metallidurans,Cupriavidus nantongensis,Cupriavidus necator,Cupriavidus neocaledonicus,Cupriavidus numazuensis,Cupriavidus oxalaticus,Cupriavidus pampae,Cupriavidus pauculus,Cupriavidus pinatubonensis,Cupriavidus plantarum,Cupriavidus respiraculi,Cupriavidus taiwanensis,Cupriavidus yeoncheonensis" -e iramirez@lcg.unam.mx -o images/cupriavidus_assemblies_sequencing_technology.png -s "Sequencing technology" -w 30 -t 10
 
 Para la generacion del archivo csv que es una tabla de todas las estadisticas, se requirio el siguiente comando
-python bioanalyser.py -f 3 -g "" -e iramirez@lcg.unam.mx -o data/Cupriavidus_Assemblies_Stats.csv
+python bioanalyser.py -f 3 -g "Cupriavidus agavae,Cupriavidus alkaliphilus,Cupriavidus basilensis,Cupriavidus campinensis,Cupriavidus cauae,Cupriavidus gilardii,Cupriavidus lacunae,Cupriavidus laharis,Cupriavidus malaysiensis,Cupriavidus metallidurans,Cupriavidus nantongensis,Cupriavidus necator,Cupriavidus neocaledonicus,Cupriavidus numazuensis,Cupriavidus oxalaticus,Cupriavidus pampae,Cupriavidus pauculus,Cupriavidus pinatubonensis,Cupriavidus plantarum,Cupriavidus respiraculi,Cupriavidus taiwanensis,Cupriavidus yeoncheonensis" -e iramirez@lcg.unam.mx -o data/Cupriavidus_Assemblies_Stats.csv
 
 ## Pregunta 
 
 
-**Podemos obtener información de las distintas características entre las diversas especies de Cupriavidus mediante el uso de librerías de Python?**
+**Podemos obtener información de las distintas caracteristicas entre las diversas especies de Cupriavidus mediante el uso de librerias de Python?**
 El objetivo a niveles generales es obtener la mayor cantidad posible de informacion que nos puede ofrecer NCBI sobre el genero cupriavidus. 
 
 
