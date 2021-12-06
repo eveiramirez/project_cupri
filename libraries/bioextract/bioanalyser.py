@@ -323,6 +323,12 @@ def stats_graph(email: str, terms: list[str], stat: str, output):
             stat].name, ylabel="no. of occurrences",
                title=f"no. of occurrences: {stats_df.loc[stat].name}")
 
+    # Rotar las etiquetas de las barras
+    plt.setp(ax.get_xticklabels(), rotation=30,
+             horizontalalignment='right')
+    # Ajustar la imagen
+    fig.tight_layout()
+
     try:
         # Guardar figura
         fig.savefig(output)
