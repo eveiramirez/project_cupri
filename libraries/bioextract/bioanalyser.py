@@ -22,6 +22,74 @@ CATEGORY
         Analyser
         Sequence
 
+EXAMPLES IN TERMINAL
+    Function: get_ids
+
+    Input: python bioanalyser.py -f 0 -g Cupriavidus -d Taxonomy
+           -e user@gmail.com
+
+    Output: ['106589']
+
+    Function: get_tax_data
+
+    Input: python bioanalyser.py -f 1 -i 106589,106588
+           -e iramirez@lcg.unam.mx
+
+    Output: [['cellular organisms', ' Bacteria', ' Proteobacteria',
+    ' Betaproteobacteria', ' Burkholderiales', ' Burkholderiaceae'],
+    ['cellular organisms', ' Bacteria', ' Terrabacteria group',
+    ' Firmicutes', ' Clostridia', ' Eubacteriales', ' Oscillospiraceae',
+    ' Pseudoflavonifractor']]
+
+    Function: assembly_stats_report
+
+    Input: python bioanalyser.py -f 2 -g "Cupriavidus malaysiensis"
+                  -e iramirez@lcg.unam.mx -o .
+
+    Output: 860011.txt dentro del directorio
+        860011.txt
+        # Assembly Statistics Report
+        # Assembly name:  ASM185432v1
+        # Organism name:  Cupriavidus malaysiensis (b-proteobacteria)
+        # Infraspecific name:  strain=USMAA1020
+        # Isolate:  pure
+        # Taxid:          367825
+        # BioSample:      SAMN05904704
+        # BioProject:     PRJNA348156
+        # Submitter:      Universiti Sains Malaysia
+        # Date:           2016-10-26
+        ...
+
+    Function: stats_dataframe
+
+    Input: python bioanalyser.py -f 3
+                  -g "ASM28281v1","ASM880192v2","ASM1960285v1"
+                  -e iramirez@lcg.unam.mx
+                  -o /home/user/Documents/dataframe.csv
+
+    Output: dataframe.csv con el path /home/user/Documents/dataframe.csv
+            dataframe.csv
+            ,ASM28281v1,ASM880192v2,ASM1960285v1
+            region-count,0,0,0
+            WGS project,AKXR01,,
+            Relation to type material,,assembly from type material,
+            RefSeq category,,Representative Genome,Representative Genome
+            top-level-count,1418,8,4
+            scaffold-count,1418,8,4
+            total-length,8546788,8942610,7548664
+            component-count,,8,4
+
+    Function: stats_graph
+
+    Input: python bioanalyser.py -f 4
+                  -g "ASM28281v1","ASM880192v2","ASM1960285v1"
+                  -e iramirez@lcg.unam.mx
+                  -o /home/user/Documents/assemblies_length.png
+                  -s "total-length"
+
+    Output: assemblies_length.png con el path
+            /home/user/Documents/dataframe.csv
+
 """
 
 from Bio import Entrez
@@ -428,7 +496,8 @@ parser.add_argument("-o", "--output",
                          " los resultados en forma de\nlista, y la "
                          "funcion"
                          " 3 en un dataframe. Para la funcion 4 es "
-                         "obligatorio")
+                         "obligatorio y para la funcion 2 solo "
+                         "requiere indicar el directorio")
 
 parser.add_argument("-s", "--stat",
                     type=str,

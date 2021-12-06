@@ -19,20 +19,19 @@ CONTACT
 DESCRIPTION
         bioanalyser es una paqueteria que contiene distintas
         herramientas para el manejo de información de bases de datos
-        de NCBI, enfocadas principalmente hacia bacterias
+        de NCBI.
 
 CATEGORY
-        Bacteria
+        Ensambles
         DNA
         Protein
-        Sequence
 
 """
 
 from bioanalyser import (get_ids, get_tax_data, assembly_stats_report,
                          get_stats_dictionary, stats_dataframe,
-                         AssemblyStatisticsReport)
+                         stats_graph, AssemblyStatisticsReport)
 
 __all__ = ['get_ids', 'get_tax_data', 'assembly_stats_report',
-           'get_stats_dictionary', 'stats_dataframe',
-           'AssemblyStatisticsReport']
+           'get_stats_dictionary', 'stats_dataframe', 'stats_graph',
+           'AssemblyStatisticsReport',]
