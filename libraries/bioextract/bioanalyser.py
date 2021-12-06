@@ -384,6 +384,10 @@ def stats_graph(email: str, terms: list[str], stat: str, output,
         ax.set(xlabel="assemblies", title=stats_df.loc[
             stat].name)
 
+        # Generar valores para las barras
+        for index, value in enumerate(values):
+            plt.text(index, value, str(value))
+
     # Generar grafica del numero de veces que aparece cada valor
     else:
         # Cambiar los valores de tipo string a int
@@ -411,6 +415,10 @@ def stats_graph(email: str, terms: list[str], stat: str, output,
         ax.set(xlabel=stats_df.loc[
             stat].name, ylabel="no. of occurrences",
                title=f"no. of occurrences: {stats_df.loc[stat].name}")
+
+        # Generar valores para las barras
+        for index, value in enumerate(val_occurrences):
+            plt.text(index, value, str(value))
 
     # Rotar las etiquetas de las barras
     plt.setp(ax.get_xticklabels(), rotation=30,
