@@ -94,11 +94,14 @@ Aqui podemos observar que nuevamente, por lo regular no se reporta la tecnologia
 
 ![image](https://user-images.githubusercontent.com/60999318/144792026-0905d611-64fe-4299-a785-b74d85a48628.png)
 
-**Cobertura de genoma*
 
 Observamos que existe una gran variacion de la precision de la secuenciacion entre los distintos organismos de Cupriavidus.
 
 ![image](https://user-images.githubusercontent.com/60999318/144792026-0905d611-64fe-4299-a785-b74d85a48628.png)
+
+![image](https://user-images.githubusercontent.com/60999318/144794891-d6cc7f9b-b73f-4575-9919-498d4d12c888.png)
+
+
 
 ## Conclusiones
 El uso de herramientas bioinformaticas ha sido lo que nos ha permitido dar un salto gigantesco en el desarrollo de la ciencia, en este caso hablamos en el ambito de la biologia, pero sin duda alguna la ciencia de datos ha tenido un impacto gigante en toda la ciencia, desde la fisica hasta la astronomia, por lo que es importante que aprendamos a interpretar el mundo que nos rodea a traves del computo; quiza un sin fin  de numeros, letras y codigo no nos pueda decir demasiado, pero somos capaces de sintetizar todo este mar de informacion dentro de graficas o tablas.  Tambien reconocer que el buen manejo de estas herramientas, la capacidad de acceder a la informacion e interpretarla nos volvera unos mejores cientificos a futuro, personalmente tambien el desarrollo de este proyecto me ha ensanado la importancia del orden y la anticipacion.  
