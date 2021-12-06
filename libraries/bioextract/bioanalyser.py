@@ -88,7 +88,7 @@ EXAMPLES IN TERMINAL
                   -s "total-length"
 
     Output: assemblies_length.png con el path
-            /home/user/Documents/dataframe.csv
+            /home/user/Documents/assemblies_length.png
 
 """
 
